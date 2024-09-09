@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot GPT</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .chat-container {
+      width: 100%;
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    .chat-box {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 400px;
+      overflow-y: auto;
+    }
+    .user-input {
+      display: flex;
+      margin-top: 10px;
+    }
+    .user-input input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    .user-input button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .message {
+      margin: 5px 0;
+    }
+    .message.user {
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-box" id="chat-box"></div>
+    <div class="user-input">
+      <input type="text" id="user-input" placeholder="Ask a question...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const apiKey = 'YOUR_OPENAI_API_KEY'; // Ganti dengan API key Anda
+
+    async function sendMessage() {
+      const userInput = document.getElementById('user-input').value;
+      if (!userInput) return;
+
+      // Tambahkan pesan pengguna ke kotak chat
+      const chatBox = document.getElementById('chat-box');
+      const userMessage = document.createElement('div');
+      userMessage.className = 'message user';
+      userMessage.textContent = 'You: ' + userInput;
+      chatBox.appendChild(userMessage);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Kirim permintaan ke API GPT
+      const response = await fetch('https://api.openai.com/v1/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "text-davinci-003",
+          prompt: userInput,
+          max_tokens: 150
+        })
+      });
+
+      const data = await response.json();
+      const botMessage = document.createElement('div');
+      botMessage.className = 'message bot';
+      botMessage.textContent = 'Bot: ' + data.choices[0].text;
+      chatBox.appendChild(botMessage);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Hapus input pengguna setelah mengirim
+      document.getElementById('user-input').value = '';
+    }
+  </script>
+</body>
+</html>
